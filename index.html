@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBCET CAMPUS PASS</title>
+    <style>
+        /* Modern Styling */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #eef2f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .card {
+            background: #ffffff;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        h1 { color: #2c3e50; margin-bottom: 1.5rem; font-size: 1.6rem; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        .input-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; color: #34495e; font-size: 0.9rem; }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background-color: #fcfcfc;
+        }
+        input:focus { border-color: #3498db; outline: none; background-color: #fff; }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 15px;
+        }
+        button:hover { background-color: #2980b9; }
+        .submit-btn { background-color: #27ae60; }
+        .submit-btn:hover { background-color: #219150; }
+        #error-msg { color: #e74c3c; font-size: 0.85rem; margin-top: 12px; display: none; font-weight: bold; }
+        .hidden { display: none; }
+        .success-text { color: #2c3e50; line-height: 1.7; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+    <div id="login-page" class="card">
+        <h1>MBCET CAMPUS PASS</h1>
+        <div class="input-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Enter Username">
+        </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter Password">
+        </div>
+        <button onclick="checkLogin()">Login</button>
+        <p id="error-msg">❌ Incorrect username/password</p>
+    </div>
+
+    <div id="details-page" class="card hidden">
+        <h1>Pass Details</h1>
+        <form id="passForm">
+            <div class="input-group">
+                <label>Name</label>
+                <input type="text" id="name" required placeholder="Full Name">
+            </div>
+            <div class="input-group">
+                <label>Semester</label>
+                <select id="semester" required>
+                    <option value="">Select Semester</option>
+                    <option value="S1">S1</option><option value="S2">S2</option>
+                    <option value="S3">S3</option><option value="S4">S4</option>
+                    <option value="S5">S5</option><option value="S6">S6</option>
+                    <option value="S7">S7</option><option value="S8">S8</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Class</label>
+                <input type="text" id="class" required placeholder="e.g. CS-A">
+            </div>
+            <div class="input-group">
+                <label>Branch</label>
+                <input type="text" id="branch" required placeholder="e.g. CSE">
+            </div>
+            <div class="input-group">
+                <label>Subject</label>
+                <input type="text" id="subject" required placeholder="Subject Name">
+            </div>
+            <div class="input-group">
+                <label>Reason</label>
+                <textarea id="reason" rows="3" required placeholder="Reason for pass"></textarea>
+            </div>
+            <button type="button" class="submit-btn" onclick="submitForm()">Submit Request</button>
+        </form>
+    </div>
+
+    <div id="success-page" class="card hidden">
+        <h1 style="color: #27ae60; border-bottom-color: #27ae60;">Success!</h1>
+        <p class="success-text">YOUR RESPONSE HAS BEEN RECORDED FOR THE APPROVAL. PLEASE CHECK YOUR WHATSAPP FOR THE FURTHER DETAILS.</p>
+    </div>
+
+    <script>
+        // --- LOGIN LOGIC ---
+        function checkLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const error = document.getElementById('error-msg');
+
+            if (user === "user123" && pass === "mbcet1234") {
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('details-page').classList.remove('hidden');
+            } else {
+                error.style.display = 'block';
+            }
+        }
+
+        // --- GOOGLE SHEETS SUBMISSION LOGIC ---
+        async function submitForm() {
+            const form = document.getElementById('passForm');
+            
+            // REPLACE THE URL BELOW WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyBFojNBQPDFZE5qKkG9KFDSULzQlinetgCFLMeH--oaVgEQNCVqzfeNE8uDGGQIjZKfw/exec'; 
+
+            if (form.checkValidity()) {
+                const btn = document.querySelector(".submit-btn");
+                btn.innerText = "Processing...";
+                btn.disabled = true;
+
+                const data = {
+                    name: document.getElementById('name').value,
+                    semester: document.getElementById('semester').value,
+                    class: document.getElementById('class').value,
+                    branch: document.getElementById('branch').value,
+                    subject: document.getElementById('subject').value,
+                    reason: document.getElementById('reason').value
+                };
+
+                try {
+                    // Send data to Google Sheets
+                    await fetch(scriptURL, {
+                        method: 'POST',
+                        mode: 'no-cors', // Essential for Google Apps Script
+                        cache: 'no-cache',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    // Success - Show final page
+                    document.getElementById('details-page').classList.add('hidden');
+                    document.getElementById('success-page').classList.remove('hidden');
+                } catch (error) {
+                    alert("Submission failed. Please check your internet or URL.");
+                    btn.innerText = "Submit Request";
+                    btn.disabled = false;
+                }
+            } else {
+                alert("Please fill in all the details first.");
+            }
+        }
+    </script>
+
+</body>
+</html>
